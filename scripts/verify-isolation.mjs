@@ -19,7 +19,7 @@ if (!process.env.WORKOS_API_KEY) {
 
 const workos = new WorkOS(process.env.WORKOS_API_KEY);
 const ACME = "org_01KZEN19E68J1TKC80KVNZH724";
-const LAALAA = "org_01KZENVGXPM7TF10A9TTPWTNVK";
+const POTTER = "org_01KZENWC1J7FC0JYXGW8PTHZ3Y";
 
 let failures = 0;
 function check(label, cond) {
@@ -36,15 +36,15 @@ async function membersOf(orgId) {
 }
 
 const acme = await membersOf(ACME);
-const laalaa = await membersOf(LAALAA);
+const potter = await membersOf(POTTER);
 
 console.log(
   `\nAcme members (${acme.length}):`,
   acme.map((m) => `${m.userId}=${m.role?.slug}`).join(", "),
 );
 console.log(
-  `Laa-Laa members (${laalaa.length}):`,
-  laalaa.map((m) => `${m.userId}=${m.role?.slug}`).join(", "),
+  `Potter members (${potter.length}):`,
+  potter.map((m) => `${m.userId}=${m.role?.slug}`).join(", "),
 );
 console.log("");
 
@@ -54,23 +54,23 @@ check(
   acme.every((m) => m.organizationId === ACME),
 );
 check(
-  "listOrganizationMemberships(Laa-Laa) returns only Laa-Laa memberships",
-  laalaa.every((m) => m.organizationId === LAALAA),
+  "listOrganizationMemberships(Potter) returns only Potter memberships",
+  potter.every((m) => m.organizationId === POTTER),
 );
 
 // 2. No user id appears in both tenants (disjoint membership sets).
 const acmeUsers = new Set(acme.map((m) => m.userId));
-const overlap = laalaa.filter((m) => acmeUsers.has(m.userId));
-check("Acme and Laa-Laa membership sets are disjoint", overlap.length === 0);
+const overlap = potter.filter((m) => acmeUsers.has(m.userId));
+check("Acme and Potter membership sets are disjoint", overlap.length === 0);
 
-// 3. Cross-tenant guard: a Laa-Laa membership id resolves to Laa-Laa, so
+// 3. Cross-tenant guard: a Potter membership id resolves to Potter, so
 //    assertMembershipInOrg(nwMembership, ACME) would throw in the app.
 const nwMembership = await workos.userManagement.getOrganizationMembership(
-  laalaa[0].id,
+  potter[0].id,
 );
 check(
-  "getOrganizationMembership(Laa-Laa id).organizationId === Laa-Laa",
-  nwMembership.organizationId === LAALAA,
+  "getOrganizationMembership(Potter id).organizationId === Potter",
+  nwMembership.organizationId === POTTER,
 );
 check(
   "=> guard would reject that membership id under Acme's context",
@@ -79,11 +79,11 @@ check(
 
 // 4. Per-org policy differs.
 const acmeOrg = await workos.organizations.getOrganization(ACME);
-const nwOrg = await workos.organizations.getOrganization(LAALAA);
+const nwOrg = await workos.organizations.getOrganization(POTTER);
 console.log("\nAcme metadata:", acmeOrg.metadata);
-console.log("Laa-Laa metadata:", nwOrg.metadata);
+console.log("Potter metadata:", nwOrg.metadata);
 check(
-  "Laa-Laa session ceiling (24h) is stricter than Acme's",
+  "Potter session ceiling (24h) is stricter than Acme's",
   Number(nwOrg.metadata?.maxSessionHours) <
     Number(acmeOrg.metadata?.maxSessionHours),
 );
