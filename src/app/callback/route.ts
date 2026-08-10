@@ -13,15 +13,22 @@ import {
 export const GET = handleAuth({
   onSuccess: async ({ organizationId }) => {
     if (!organizationId) return;
-    const maxHours = await resolveMaxSessionHours(organizationId);
-    const value = encodeSessionPolicy({ authAtMs: Date.now(), maxHours });
-    const cookieStore = await cookies();
-    cookieStore.set(SESSION_POLICY_COOKIE, value, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: maxHours * 60 * 60,
-    });
+    // Never let stamping the policy cookie block a sign-in. If it fails, the
+    // session simply has no ceiling stamp; requireOrgContext fails open (no
+    // enforced expiry) rather than locking the user out.
+    try {
+      const maxHours = await resolveMaxSessionHours(organizationId);
+      const value = encodeSessionPolicy({ authAtMs: Date.now(), maxHours });
+      const cookieStore = await cookies();
+      cookieStore.set(SESSION_POLICY_COOKIE, value, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+        maxAge: maxHours * 60 * 60,
+      });
+    } catch (e) {
+      console.error("Failed to stamp session policy cookie:", e);
+    }
   },
 });
