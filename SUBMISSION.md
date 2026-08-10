@@ -2,8 +2,8 @@
 
 ## 1. Links
 
-- **Deployed app**: _TODO — Vercel URL (see “Deploying” at the bottom)_
-- **Repo**: _TODO — your repo URL_
+- **Deployed app**: https://workos-takehome-six.vercel.app
+- **Repo**: https://github.com/adepeza1/workos-takehome
 - **Video**: _TODO — 5–10 min walkthrough_
 
 ## 2. Test credentials
@@ -11,15 +11,16 @@
 The demo tenant is **Acme Corp**, and Acme's IT mandated that every employee
 signs in through their own Okta — so all three Acme roles authenticate through
 SSO (the WorkOS **Test IdP** stands in for Okta; no password). The strict-policy
-prospect, **Northwind**, is a separate tenant used to prove per-customer policy;
-its admin uses password + MFA.
+prospect (the **Laa-Laa** tenant, standing in for the brief's unnamed "biggest
+prospect") is a separate organization used to prove per-customer policy; its
+admin login is `admin@northwind.com`, which uses password + MFA.
 
 | Role | Email | Password | What to try while logged in as this user |
 | ---- | ----- | -------- | ---------------------------------------- |
 | **Admin** (Acme) | admin@acme.com | *SSO — no password* | On the home page click **“Sign in with Acme Corp SSO”** → Test IdP → enter `admin@acme.com`. On **/team**: invite someone, change a member's role, remove a member. Full control. |
 | **Team lead** (Acme) | lead@acme.com | *SSO — no password* | Sign in the same SSO way as `lead@acme.com`. On **/team** you can invite and remove people, but there's no role dropdown — team leads can't change roles or promote to admin (enforced server-side). |
 | **Compliance** (Acme) | compliance@acme.com | *SSO — no password* | Sign in via SSO as `compliance@acme.com`. **/team** is fully read-only: no invite box, no remove buttons, no role controls. Every mutation is refused on the server even if forced. |
-| **Admin** (Northwind — strict prospect) | admin@northwind.com | `MeridianDemo!2026` | Use the standard **“Sign in”** button, password, then enroll MFA (required). Visit **/account** to see this tenant's policy: **MFA required** and a **24-hour** session limit — neither of which applies to Acme. |
+| **Admin** (Laa-Laa — strict prospect) | admin@northwind.com | `MeridianDemo!2026` | Use the standard **“Sign in”** button, password, then enroll MFA (required). Visit **/account** to see this tenant's policy: **MFA required** and a **24-hour** session limit — neither of which applies to Acme. |
 
 > Acme roles are SSO-only because Acme has `domainSsoRequired` set (password auth
 > disabled for the org). That is the point of requirement #4, so it's intentional.
@@ -34,7 +35,7 @@ its admin uses password + MFA.
 | **2. Admins self-serve invite / remove / change access, no ticket** | `src/app/team/actions.ts` (`inviteMember`, `removeMember`, `changeRole`, `revokeInvite`) + `src/app/team/members-table.tsx`. WorkOS **User Management** (invitations, memberships). | Fully in-app. Pending invitations render inline so a newly invited seat is immediately visible. |
 | **3. Three roles: admin / team lead / compliance (read-only)** | WorkOS **Roles & Permissions**: `admin` = `members:invite`+`members:remove`+`members:manage_roles`; `team_lead` = `members:invite`+`members:remove`; `compliance` = *no* permissions. Enforced in `actions.ts` and reflected in the UI. | Named them admin / team lead / compliance. The compliance requirement is a *negative* one — the proof is that mutations are refused server-side, not just hidden. Role-assignment is treated as a higher privilege than invite/remove, so a team lead can invite but only as a Member. True “team lead sees only *their own* people” needs Groups/FGA — see cut list. |
 | **4. Sign in through Acme's Okta (dealbreaker)** | WorkOS **SSO connection** on Acme via the **Test IdP**; `domainSsoRequired` on the org. `src/app/login/route.ts` routes `?organizationId=<Acme>` straight into Acme's connection. Verified by `scripts/verify-auth.mjs` (password refused → `sso_required`). | Every Acme employee is forced through SSO, not just admins — matches “no Okta, no deal.” Test IdP is the sanctioned Okta stand-in. |
-| **5. 24h sessions + admin MFA for ONE customer, others unchanged** | **MFA**: native per-org via `nonDomainMfaRequired`/`domainMfaRequired` on Northwind (verified: `mfa_enrollment` at sign-in). **24h session**: app-layer enforcement — `src/lib/session-policy.ts` (signed stamp) + `requireOrgContext` + `src/app/callback/route.ts` + `src/app/session-expired/route.ts`. Policy read from org **metadata** (`maxSessionHours`). | See Pushback: WorkOS enforces MFA per-org natively, but session *length* is only environment-wide, so I enforce the 24h ceiling in the app, per-org, driven by org metadata. Acme = 168h, Northwind = 24h; the two never affect each other. |
+| **5. 24h sessions + admin MFA for ONE customer, others unchanged** | **MFA**: native per-org via `nonDomainMfaRequired`/`domainMfaRequired` on the Laa-Laa tenant (verified: `mfa_enrollment` at sign-in). **24h session**: app-layer enforcement — `src/lib/session-policy.ts` (signed stamp) + `requireOrgContext` + `src/app/callback/route.ts` + `src/app/session-expired/route.ts`. Policy read from org **metadata** (`maxSessionHours`). | See Pushback: WorkOS enforces MFA per-org natively, but session *length* is only environment-wide, so I enforce the 24h ceiling in the app, per-org, driven by org metadata. Acme = 168h, Laa-Laa = 24h; the two never affect each other. |
 | **6. “Can the demo just call the WorkOS API from the frontend with the key?”** | Answered in Pushback below; the whole app is built the opposite way. | The API key is a workspace-wide admin credential. See Pushback. |
 | **7. (Bonus) Slack ping on seat changes** | Not built — see Cut list. | Explicitly optional; `actions.ts` is the natural single hook point when it's added. |
 

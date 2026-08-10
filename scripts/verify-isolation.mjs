@@ -19,7 +19,7 @@ if (!process.env.WORKOS_API_KEY) {
 
 const workos = new WorkOS(process.env.WORKOS_API_KEY);
 const ACME = "org_01KZEN19E68J1TKC80KVNZH724";
-const NORTHWIND = "org_01KZENVGXPM7TF10A9TTPWTNVK";
+const LAALAA = "org_01KZENVGXPM7TF10A9TTPWTNVK";
 
 let failures = 0;
 function check(label, cond) {
@@ -36,15 +36,15 @@ async function membersOf(orgId) {
 }
 
 const acme = await membersOf(ACME);
-const northwind = await membersOf(NORTHWIND);
+const laalaa = await membersOf(LAALAA);
 
 console.log(
   `\nAcme members (${acme.length}):`,
   acme.map((m) => `${m.userId}=${m.role?.slug}`).join(", "),
 );
 console.log(
-  `Northwind members (${northwind.length}):`,
-  northwind.map((m) => `${m.userId}=${m.role?.slug}`).join(", "),
+  `Laa-Laa members (${laalaa.length}):`,
+  laalaa.map((m) => `${m.userId}=${m.role?.slug}`).join(", "),
 );
 console.log("");
 
@@ -54,23 +54,23 @@ check(
   acme.every((m) => m.organizationId === ACME),
 );
 check(
-  "listOrganizationMemberships(Northwind) returns only Northwind memberships",
-  northwind.every((m) => m.organizationId === NORTHWIND),
+  "listOrganizationMemberships(Laa-Laa) returns only Laa-Laa memberships",
+  laalaa.every((m) => m.organizationId === LAALAA),
 );
 
 // 2. No user id appears in both tenants (disjoint membership sets).
 const acmeUsers = new Set(acme.map((m) => m.userId));
-const overlap = northwind.filter((m) => acmeUsers.has(m.userId));
-check("Acme and Northwind membership sets are disjoint", overlap.length === 0);
+const overlap = laalaa.filter((m) => acmeUsers.has(m.userId));
+check("Acme and Laa-Laa membership sets are disjoint", overlap.length === 0);
 
-// 3. Cross-tenant guard: a Northwind membership id resolves to Northwind, so
+// 3. Cross-tenant guard: a Laa-Laa membership id resolves to Laa-Laa, so
 //    assertMembershipInOrg(nwMembership, ACME) would throw in the app.
 const nwMembership = await workos.userManagement.getOrganizationMembership(
-  northwind[0].id,
+  laalaa[0].id,
 );
 check(
-  "getOrganizationMembership(Northwind id).organizationId === Northwind",
-  nwMembership.organizationId === NORTHWIND,
+  "getOrganizationMembership(Laa-Laa id).organizationId === Laa-Laa",
+  nwMembership.organizationId === LAALAA,
 );
 check(
   "=> guard would reject that membership id under Acme's context",
@@ -79,11 +79,11 @@ check(
 
 // 4. Per-org policy differs.
 const acmeOrg = await workos.organizations.getOrganization(ACME);
-const nwOrg = await workos.organizations.getOrganization(NORTHWIND);
+const nwOrg = await workos.organizations.getOrganization(LAALAA);
 console.log("\nAcme metadata:", acmeOrg.metadata);
-console.log("Northwind metadata:", nwOrg.metadata);
+console.log("Laa-Laa metadata:", nwOrg.metadata);
 check(
-  "Northwind session ceiling (24h) is stricter than Acme's",
+  "Laa-Laa session ceiling (24h) is stricter than Acme's",
   Number(nwOrg.metadata?.maxSessionHours) <
     Number(acmeOrg.metadata?.maxSessionHours),
 );

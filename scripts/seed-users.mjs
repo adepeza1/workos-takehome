@@ -1,7 +1,7 @@
 // Reproducible seed for the Meridian demo test users.
 //
 // Sets known passwords on the pre-created Acme role users and creates the
-// strict-policy prospect (Northwind) admin. Idempotent-ish: safe to re-run;
+// strict-policy prospect (Laa-Laa) admin. Idempotent-ish: safe to re-run;
 // createUser will 422 if the user already exists (caught and reported).
 //
 //   node scripts/seed-users.mjs
@@ -32,7 +32,7 @@ const workos = new WorkOS(process.env.WORKOS_API_KEY);
 
 const DEMO_PASSWORD = "MeridianDemo!2026";
 const ACME = "org_01KZEN19E68J1TKC80KVNZH724";
-const NORTHWIND = "org_01KZENVGXPM7TF10A9TTPWTNVK";
+const LAALAA = "org_01KZENVGXPM7TF10A9TTPWTNVK";
 
 // Pre-created Acme role users (roles already assigned in the dashboard).
 const ACME_PASSWORD_USERS = [
@@ -49,7 +49,7 @@ async function setPassword(user) {
   console.log(`  set password + verified: ${user.email}`);
 }
 
-async function ensureNorthwindAdmin() {
+async function ensureLaaLaaAdmin() {
   const email = "admin@northwind.com";
   let user;
   const existing = await workos.userManagement.listUsers({ email });
@@ -60,7 +60,7 @@ async function ensureNorthwindAdmin() {
       password: DEMO_PASSWORD,
       emailVerified: true,
     });
-    console.log(`  updated existing Northwind admin: ${email}`);
+    console.log(`  updated existing Laa-Laa admin: ${email}`);
   } else {
     user = await workos.userManagement.createUser({
       email,
@@ -69,22 +69,22 @@ async function ensureNorthwindAdmin() {
       lastName: "Admin",
       emailVerified: true,
     });
-    console.log(`  created Northwind admin: ${email} (${user.id})`);
+    console.log(`  created Laa-Laa admin: ${email} (${user.id})`);
   }
 
   const memberships = await workos.userManagement.listOrganizationMemberships({
     userId: user.id,
-    organizationId: NORTHWIND,
+    organizationId: LAALAA,
   });
   if (memberships.data.length === 0) {
     await workos.userManagement.createOrganizationMembership({
       userId: user.id,
-      organizationId: NORTHWIND,
+      organizationId: LAALAA,
       roleSlug: "admin",
     });
-    console.log(`  added ${email} to Northwind as admin`);
+    console.log(`  added ${email} to Laa-Laa as admin`);
   } else {
-    console.log(`  ${email} already a member of Northwind`);
+    console.log(`  ${email} already a member of Laa-Laa`);
   }
 }
 
@@ -97,11 +97,11 @@ for (const u of ACME_PASSWORD_USERS) {
   }
 }
 
-console.log("Seeding Northwind admin...");
+console.log("Seeding Laa-Laa admin...");
 try {
-  await ensureNorthwindAdmin();
+  await ensureLaaLaaAdmin();
 } catch (e) {
-  console.error("  FAILED northwind admin:", e?.message ?? e);
+  console.error("  FAILED Laa-Laa admin:", e?.message ?? e);
 }
 
 console.log("Done.");

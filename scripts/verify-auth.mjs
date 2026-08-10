@@ -2,7 +2,7 @@
 // The point is to prove the *policies* fire at sign-in time:
 //   - Acme is Okta-only: password auth for @acme.com users is refused with
 //     sso_required (req #4 — every Acme employee signs in through Okta).
-//   - Northwind enforces MFA: its admin cannot get a plain-password session,
+//   - Laa-Laa enforces MFA: its admin cannot get a plain-password session,
 //     it is blocked pending MFA enrollment (req #5 — per-org admin MFA).
 //
 //   node scripts/verify-auth.mjs
