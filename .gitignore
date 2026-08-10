@@ -31,6 +31,10 @@ yarn-error.log*
 # vercel
 .vercel
 
+# agent tooling (reconstruct with `npx skills add`; skills-lock.json is committed)
+.claude/
+.agents/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

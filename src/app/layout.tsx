@@ -12,8 +12,9 @@ import {
 } from "@workos-inc/authkit-nextjs/components";
 
 export const metadata: Metadata = {
-  title: "Example AuthKit Authenticated App",
-  description: "Example Next.js application demonstrating how to use AuthKit.",
+  title: "Meridian Analytics — Workspace",
+  description:
+    "Multi-tenant B2B workspace for Meridian Analytics, powered by WorkOS AuthKit.",
 };
 
 export default function RootLayout({
@@ -41,6 +42,10 @@ export default function RootLayout({
                           <Flex gap="4">
                             <Button asChild variant="soft">
                               <NextLink href="/">Home</NextLink>
+                            </Button>
+
+                            <Button asChild variant="soft">
+                              <NextLink href="/team">Team</NextLink>
                             </Button>
 
                             <Button asChild variant="soft">
