@@ -41,3 +41,6 @@ next-env.d.ts
 # local archive
 workos-takehome.zip
 *.zip
+
+# local demo prep
+video-script.md

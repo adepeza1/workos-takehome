@@ -108,8 +108,13 @@ admin, Fred (`adepeza1+potter@gmail.com`), signs in with password + MFA.
 
 1. **Slack seat-change notifications (#7 bonus)** via WorkOS **Pipes** →
    `#customer-success`. `src/app/team/actions.ts` is the single hook point.
-2. **Sub-team scoping for team leads** (Directory groups / FGA) so “their own
-   people” is literally enforced.
+2. **Sub-team scoping for team leads** so “their own people” is literally
+   enforced. This is the one requirement that's genuinely beyond RBAC: role-wide
+   permissions can't say “this lead manages *these specific* members.” The right
+   tool is **WorkOS FGA** (relationship-based / ReBAC) — model a
+   `manages`/`member_of` relationship between a lead and their sub-team and
+   authorize per-resource. (RBAC stays the right tool for the org-wide roles like
+   admin and compliance; FGA is additive for the per-resource case.)
 3. **Audit surface for compliance** — compliance can already *see* members;
    surface WorkOS **Audit Logs** so they can see seat changes over time.
 4. **Self-serve SSO/domain setup** via the Admin Portal / SSO widget, so a new
