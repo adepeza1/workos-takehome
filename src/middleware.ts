@@ -12,5 +12,11 @@ export default authkitMiddleware({
 });
 
 export const config = {
-  matcher: ["/", "/account/:path*", "/team/:path*", "/api/:path*"],
+  matcher: [
+    "/",
+    "/account/:path*",
+    "/team/:path*",
+    "/team-widget",
+    "/api/:path*",
+  ],
 };

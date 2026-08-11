@@ -1,4 +1,5 @@
-import { Badge, Callout, Flex, Heading, Text } from "@radix-ui/themes";
+import NextLink from "next/link";
+import { Badge, Callout, Flex, Heading, Link, Text } from "@radix-ui/themes";
 import { InfoCircledIcon } from "@radix-ui/react-icons";
 import {
   getMembers,
@@ -25,10 +26,20 @@ export default async function TeamPage() {
           <Badge color="iris" variant="soft" size="2">
             You are {roleLabel(ctx.role)}
           </Badge>
+          <Badge color="gray" variant="soft" size="2">
+            Custom UI
+          </Badge>
         </Flex>
         <Text color="gray">
           Everyone in {policy.name}&rsquo;s workspace — scoped to your
           organization only. You have no visibility into any other customer.
+        </Text>
+        <Text size="2" color="gray">
+          Compare with the{" "}
+          <Link asChild>
+            <NextLink href="/team-widget">WorkOS widget version</NextLink>
+          </Link>{" "}
+          of this page.
         </Text>
       </Flex>
 
