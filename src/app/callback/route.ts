@@ -25,7 +25,12 @@ export const GET = handleAuth({
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
         path: "/",
-        maxAge: maxHours * 60 * 60,
+        // Must outlive the policy window, not equal it: the stamp has to still
+        // be readable at the moment the session expires so we can bounce the
+        // user. If maxAge == the window, the cookie vanishes exactly when we
+        // need it and enforcement fails open. 30 days comfortably covers both
+        // the 24h policy and the compressed demo value.
+        maxAge: 60 * 60 * 24 * 30,
       });
     } catch (e) {
       console.error("Failed to stamp session policy cookie:", e);
