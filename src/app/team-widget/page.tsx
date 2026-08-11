@@ -51,6 +51,24 @@ export default async function TeamWidgetPage() {
         </Text>
       </Flex>
 
+      <Callout.Root variant="surface" color="iris">
+        <Callout.Icon>
+          <InfoCircledIcon />
+        </Callout.Icon>
+        <Callout.Text>
+          This page is an evaluation, not the shipped product. The app ships the
+          custom{" "}
+          <Link asChild>
+            <NextLink href="/team">/team</NextLink>
+          </Link>{" "}
+          UI because the brief needs a read-only compliance role and a team lead
+          who can invite but not change roles — and this widget has a single
+          manage-or-nothing permission (<code>widgets:users-table:manage</code>)
+          with no read-only mode. The widget is the right tool when all you need
+          is admin user management; here the RBAC requirements exceed it.
+        </Callout.Text>
+      </Callout.Root>
+
       {authToken ? (
         <>
           <Callout.Root variant="surface" color="gray">

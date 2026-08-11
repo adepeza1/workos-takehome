@@ -64,9 +64,17 @@ admin, Fred (`adepeza1+potter@gmail.com`), signs in with password + MFA.
     already had finer-grained `members:invite` / `members:remove` /
     `members:manage_roles`; kept those and made role-assignment a strictly higher
     privilege, which gave a cleaner three-tier RBAC story.
-  - Considered the drop-in **User Management widget**; chose a custom UI + server
-    actions instead so the compliance *read-only* case and the tenant boundary are
-    provable server-side rather than trusted to a widget.
+  - **Built both the drop-in WorkOS widget and a custom UI, then shipped custom.**
+    `/team-widget` is the native `<UsersManagement>` widget (working, org-scoped
+    token minted server-side) kept as a labeled comparison; `/team` is the shipped
+    custom page. The widget is excellent for simple admin user management, but its
+    single `widgets:users-table:manage` permission is view-and-edit with **no
+    read-only mode**, so it can't express requirement #3: compliance would either
+    be locked out entirely or handed full edit controls. It also can't model the
+    team-lead tier (invite but not change roles). Custom lets me enforce those
+    server-side and *prove* the compliance negative case. (Wiring the widget also
+    surfaced that its browser calls need a CORS origin, whereas the custom page
+    calls WorkOS server-side.)
 - **The prompt/technique that paid off most**: verifying platform capabilities
   against the **live MCP control plane before designing**, not from memory. That's
   what surfaced the per-org session-length gap (#5) and the SSO-required posture
