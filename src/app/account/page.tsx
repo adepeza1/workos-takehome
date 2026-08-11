@@ -85,7 +85,7 @@ export default async function AccountPage() {
           <Separator size="4" />
           <Row
             label="Session limit"
-            value={`${policy.maxSessionHours} hours from sign-in`}
+            value={`${policy.sessionLimitLabel} from sign-in`}
           />
           <Flex align="center" gap="6">
             <Text weight="bold" size="2" style={{ width: 140 }}>

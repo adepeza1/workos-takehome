@@ -75,22 +75,36 @@ export async function requireOrgContext(): Promise<OrgContext> {
 export interface OrgPolicy {
   name: string;
   maxSessionHours: number;
+  /** Human-readable session limit, e.g. "24 hours" or "30 seconds". */
+  sessionLimitLabel: string;
   tier: string;
   mfaRequired: boolean;
   note?: string;
+}
+
+/** Render a duration in hours as the largest sensible unit for display. */
+function formatSessionLimit(hours: number): string {
+  const seconds = Math.round(hours * 3600);
+  if (seconds < 60) return `${seconds} second${seconds === 1 ? "" : "s"}`;
+  const minutes = Math.round(hours * 60);
+  if (minutes < 60) return `${minutes} minute${minutes === 1 ? "" : "s"}`;
+  const whole = Math.round(hours);
+  return `${whole} hour${whole === 1 ? "" : "s"}`;
 }
 
 /** Read an org's display policy from its WorkOS metadata. */
 export async function getOrgPolicy(organizationId: string): Promise<OrgPolicy> {
   const org = await getWorkOS().organizations.getOrganization(organizationId);
   const metadata = (org.metadata ?? {}) as Record<string, string>;
-  const maxSessionHours = Number(metadata.maxSessionHours);
+  const parsed = Number(metadata.maxSessionHours);
+  const maxSessionHours = Number.isFinite(parsed)
+    ? parsed
+    : DEFAULT_MAX_SESSION_HOURS;
   const tier = metadata.policyTier ?? "standard";
   return {
     name: org.name,
-    maxSessionHours: Number.isFinite(maxSessionHours)
-      ? maxSessionHours
-      : DEFAULT_MAX_SESSION_HOURS,
+    maxSessionHours,
+    sessionLimitLabel: formatSessionLimit(maxSessionHours),
     tier,
     mfaRequired: tier === "strict",
     note: metadata.policyNote,
