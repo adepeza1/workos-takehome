@@ -18,7 +18,8 @@ export const GET = handleAuth({
     // enforced expiry) rather than locking the user out.
     try {
       const maxHours = await resolveMaxSessionHours(organizationId);
-      const value = encodeSessionPolicy({ authAtMs: Date.now(), maxHours });
+      const maxSeconds = Math.max(1, Math.round(maxHours * 3600));
+      const value = encodeSessionPolicy({ authAtMs: Date.now(), maxSeconds });
       const cookieStore = await cookies();
       cookieStore.set(SESSION_POLICY_COOKIE, value, {
         httpOnly: true,
